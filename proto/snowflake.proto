@@ -1,0 +1,28 @@
+syntax = "proto3";
+package snowflake;
+option go_package = "proto";
+
+service Snowflake {
+    rpc Next(NextRequest) returns (NextReply) {}
+
+    rpc Parse(ParseRequest) returns (ParseReply) {}
+}
+
+message NextRequest {
+    int64 serviceId = 1;  // service id
+}
+
+message NextReply {
+    int64 id = 1;  // snowflake id
+}
+
+message ParseRequest {
+    int64 id = 1;  // snowflake id
+}
+
+message ParseReply {
+    int64  timestamp = 1;  // Unix timestamp
+    int64  nodeId = 2;     // node id
+    int64  serviceId = 3;  // service id
+    int64  seq = 4;        // sequence number
+}

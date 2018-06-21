@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Snowflake\\": "protobuf/Snowflake",
+            "GPBMetadata\\": "protobuf/GPBMetadata"
+        }
+    },
+    "require": {
+        "grpc/grpc": "^1.12"
+    }
+}
