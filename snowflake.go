@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 // EPOCH 时间偏移量
 const EPOCH int64 = 1523980800000
@@ -15,7 +18,11 @@ const MAX5BIT int64 = 31
 const MAX12BIT int64 = 4095
 
 // seq 自增序列
-var seq int64
+type sequence struct {
+	mux sync.Mutex
+	val int64
+}
+var seq sequence
 
 // nodeID 节点号
 var nodeID int64
@@ -33,10 +40,12 @@ func next(serviceID int64) int64 {
 	serviceID &= MAX5BIT
 	serviceID <<= 12
 	// 自增序列
-	seq &= MAX12BIT
-	seq++
+	seq.mux.Lock()
+	seq.val &= MAX12BIT
+	seq.val++
+	defer seq.mux.Unlock()
 
-	return timestamp | nodeID | serviceID | seq
+	return timestamp | nodeID | serviceID | seq.val
 }
 
 // parse 从 next() 生成的 id 中解析出时间戳、节点号、服务编号和自增序列
@@ -59,7 +68,7 @@ func parse(id int64) (t time.Time, timestamp int64, nodeID int64, serviceID int6
 	serviceIDMask = MAX5BIT << 12
 	serviceID = (id & serviceIDMask) >> 12
 
-	// 取得自增序列
+	// 取得生成 id 时的自增序列
 	seqMask := MAX12BIT
 	seq = id & seqMask
 	return
