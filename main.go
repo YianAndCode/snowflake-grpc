@@ -6,7 +6,8 @@ import (
 	"net"
 	"strconv"
 
-	"./proto"
+	"snowflake/proto"
+
 	"google.golang.org/grpc"
 )
 
