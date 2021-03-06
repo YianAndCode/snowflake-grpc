@@ -40,6 +40,18 @@ cd bin
 ./snowflake-grpc-server
 ```
 
+### Docker
+
+```
+# 拉取镜像
+docker pull mryian/snowflake-grpc-server:latest
+
+# 启动容器
+docker run --restart=always -d --name snowflake -p 6666:6666 mryian/snowflake-grpc-server:latest
+# 或者
+docker run --restart=always -d --name snowflake -v ./config.json:/config.json -p 6666:6666 mryian/snowflake-grpc-server:latest
+```
+
 ## 使用方法（Client）
 
 ### 安装依赖
