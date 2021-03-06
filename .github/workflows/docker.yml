@@ -1,0 +1,45 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+
+env:
+  IMAGE_NAME: snowflake-grpc-server
+  DOCKER_HUB_USERNAME: mryian
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build snowflake-grpc-server
+      run: ./build.sh
+
+    - name: Build image
+      run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
+    - name: Log into registry
+      run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+
+    - name: Push image
+      run: |
+        IMAGE_ID=$DOCKER_HUB_USERNAME/$IMAGE_NAME
+        # Change all uppercase to lowercase
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+        # Strip git ref prefix from version
+        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        # Strip "v" prefix from tag name
+        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+        # Use Docker `latest` tag convention
+        [ "$VERSION" == "$default-branch" ] && VERSION=latest
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
+        docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+        docker push $IMAGE_ID:$VERSION
