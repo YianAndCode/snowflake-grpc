@@ -8,7 +8,6 @@ on:
 
 env:
   IMAGE_NAME: snowflake-grpc-server
-  DOCKER_HUB_USERNAME: mryian
 
 jobs:
 
@@ -26,7 +25,7 @@ jobs:
       run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
     - name: Log into registry
-      run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+      run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
     - name: Push image
       run: |
